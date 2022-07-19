@@ -7,9 +7,9 @@
 
 import UIKit
 
-class FeaturedViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class FeaturedViewController: UIViewController {
     
-    let popularMovies = Movie.popularMovies()
+    var popularMovies : [Movie] = []
     let nowPlayingMovies = Movie.nowPlayingMovies()
     
     @IBOutlet var popularCollectionView: UICollectionView!
@@ -28,9 +28,20 @@ class FeaturedViewController: UIViewController, UICollectionViewDataSource, UICo
         
         upcomingCollectionView.dataSource = self
         upcomingCollectionView.delegate = self
+        
+        Task {
+            popularMovies = await Movie.popularMoviesAPI()
+            self.popularCollectionView.reloadData()
+        }
     }
 
-    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let destination = segue.destination as? DetailsViewController {
+            let movie = sender as? Movie
+            destination.movie = movie
+            
+        }
+    }
     
 }
 
