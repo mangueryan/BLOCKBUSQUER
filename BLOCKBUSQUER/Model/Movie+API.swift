@@ -16,7 +16,7 @@ extension Movie {
         var components = Movie.urlComponents
         components.path = "/3/movie/popular"
         components.queryItems = [
-            URLQueryItem(name: "api_key", value: apiKey) 
+            URLQueryItem(name: "api_key", value: Movie.apiKey)
         ]
         let session = URLSession.shared
         
@@ -33,6 +33,51 @@ extension Movie {
         return []
     }
     
+    static func nowPlayingMoviesAPI() async -> [Movie] {
+        var components = Movie.urlComponents
+        components.path = "/3/movie/now_playing"
+        components.queryItems = [
+            URLQueryItem(name: "api_key", value: Movie.apiKey)
+        ]
+        let session = URLSession.shared
+        
+        do{
+            let (data, response) = try await session.data(from: components.url!)
+            
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            let nowPlayingResult = try decoder.decode(MoviesResponse.self, from: data)
+            
+            return nowPlayingResult.results
+        } catch{
+            print(error)
+        }
+        
+        return []
+    }
+    
+    static func upcomingMoviesAPI() async -> [Movie] {
+        var components = Movie.urlComponents
+        components.path = "/3/movie/upcoming"
+        components.queryItems = [
+            URLQueryItem(name: "api_key", value: Movie.apiKey)
+        ]
+        let session = URLSession.shared
+        
+        do{
+            let (data, response) = try await session.data(from: components.url!)
+            
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            let upcomingResult = try decoder.decode(MoviesResponse.self, from: data)
+            
+            return upcomingResult.results
+        } catch{
+            print(error)
+        }
+        
+        return []
+    }
     
     // MARK: - Download de Imagens
     static func downloadImageData(withPath: String) async -> Data {
